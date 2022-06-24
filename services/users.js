@@ -16,7 +16,7 @@ class User{
     async getByEmail(email){
         try {
             const user = await UserModel.findOne({email})
-
+            console.log();
             return user
         } catch (error) {
             console.log(error)
@@ -42,6 +42,14 @@ class User{
             }
         }catch(error){
             return dbError(error)
+        }
+    }
+    async getById(id, data){
+        try{
+            const user = await UserModel.findById(id)
+            return user
+        }catch(error){
+            console.log(error)
         }
     }
 }

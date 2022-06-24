@@ -17,6 +17,10 @@ function users(app){
         const response = await userServ.create(req.body);
         return res.json(response)
     })
+    router.get("/:id",async (req,res)=>{
+        const user = await userServ.getById(req.params.id,req.body)
+        return res.json(user)
+    })
 }
 
 module.exports = users
