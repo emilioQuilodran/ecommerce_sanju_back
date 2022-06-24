@@ -25,6 +25,10 @@ class Auth{
         if(data && data.password){
             data.password = await this.#encrypt(data.password)
         }
+        data.provider = {
+            local:true
+        }
+
         const userServ = new User()
         const result = await userServ.create(data)
         if(!result.created){
@@ -35,7 +39,6 @@ class Auth{
         }
 
         return this.#getUserData(result.user)
-
     }
 
     async socialLogin(data){
@@ -49,6 +52,15 @@ class Auth{
         }
         const result = await userServ.getOrCreate(user)
 
+        if(!result.created){
+            // Verificar si el correo está en uso
+            return {
+                success:false,
+
+                errors:result.errors
+            }
+        }
+
         return this.#getUserData(result)
     }
 
@@ -57,6 +69,9 @@ class Auth{
             role:user.role,
             name:user.name,
             email:user.email,
+            provider:user.provider,
+            idProvider:user.idProvider,
+            stripeCustomerID:user.stripeCustomerID,
             id:user.id
         }
 

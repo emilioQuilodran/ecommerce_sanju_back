@@ -19,13 +19,24 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:[true,"Password is required"]
     },
+    profilePic:String,
     role:{
         type:Number,
         default:1
     },
-    profilePic:String,
-    provider:String,
-    idProvider:String
+    provider:{
+        local:Boolean,
+        facebook:Boolean,
+        google:Boolean,
+        twitter:Boolean,
+        github:Boolean
+    },
+    idProvider:{
+        facebook:String,
+        google:String,
+        twitter:String,
+        github:String
+    }
 })
 
 const UserModel = mongoose.model("user",userSchema)

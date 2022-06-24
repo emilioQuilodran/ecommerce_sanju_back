@@ -3,6 +3,16 @@ const UserModel = require("../models/user")
 const uuid = require("uuid")
 
 class User{
+    async getAll(){
+        try{
+            const users = await UserModel.find()
+            // Ya tenemos disponubles los datos
+            return users // Array de objetos
+        }catch(error){
+            console.log(error)
+        }
+    }
+
     async getByEmail(email){
         try {
             const user = await UserModel.findOne({email})
