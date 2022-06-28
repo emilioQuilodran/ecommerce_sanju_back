@@ -2,6 +2,7 @@
 const paypalClient = require("../libs/paypalClient");
 const CartModel = require("../models/cart");
 const paypal = require("@paypal/checkout-server-sdk"); // se utiliza para generar las ordenes
+const UserModel = require("../models/user");
 
 class Payments {
     async createPayPalOrder(idUser){
@@ -34,6 +35,19 @@ class Payments {
         return {
             success: true,
             orderId: response.result.id // con el id el front pinta la data
+        }
+    }
+
+    async confirmPaypal(orderId, data){
+        switch(data.event_type){
+            case 'PAYMENT.CAPTURE.COMPLETED':
+                const orderID = data.resource.id
+                const user = await UserModel.findOne({paypalOrderId:orderID})
+                console.log(user);
+                const cart = await CartModel.findByIdAndUpdate(user.id, {
+                    items:[],
+                },{new:true})
+                break;
         }
     }
 }

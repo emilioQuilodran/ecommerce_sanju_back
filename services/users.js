@@ -1,6 +1,7 @@
 const dbError = require("../helpers/dbError")
 const UserModel = require("../models/user")
 const uuid = require("uuid")
+const bcrypt = require("bcrypt")
 
 class User{
     async getAll(){
@@ -34,6 +35,9 @@ class User{
     }
 
     async create(data){
+        if(data && data.password){
+            data.password = await this.#encrypt(data.password)
+        }
         try{
             const user = await UserModel.create(data)
             return {
@@ -48,6 +52,24 @@ class User{
         try{
             const user = await UserModel.findById(id)
             return user
+        }catch(error){
+            console.log(error)
+        }
+    }
+    async delete(id){
+        try{
+            const user = await UserModel.findByIdAndDelete(id)
+            return user;
+        }catch(error){
+            console.log(error);
+        }
+    }
+    async #encrypt(string){
+        try{
+            const salt = await bcrypt.genSalt()
+            const hash = await bcrypt.hash(string,salt)
+
+            return hash
         }catch(error){
             console.log(error)
         }
