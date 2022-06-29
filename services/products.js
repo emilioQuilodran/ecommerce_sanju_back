@@ -41,6 +41,34 @@ class Products {
 
         return product
     }
+
+    async update(id,data){
+        try{
+            const product = await ProductModel.findByIdAndUpdate(id,data,{new:true})
+            return product 
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+    async delete(id){
+        try{
+            const product = await ProductModel.findByIdAndDelete(id)
+
+            return product 
+        }catch(error){
+            console.log(error)
+        }
+    }
+
+    async getById(id){
+        try{
+            const product = await ProductModel.findById(id)
+            return product
+        }catch(error){
+            console.log(error)
+        }
+    }
 }
 
 module.exports = Products;
