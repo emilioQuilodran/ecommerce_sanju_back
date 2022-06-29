@@ -14,6 +14,7 @@ const config = {
     dbName:process.env.DB_NAME,
     paypalClientId: process.env.PAYPAL_CLIENT_ID,
     paypalClientSecret: process.env.PAYPAL_CLIENT_SECRET,
+    mercadoPagoSecretKey:process.env.MERCADOPAGO_SECRET_KEY,
     oauthClientID: process.env.OAUTH_CLIENT_ID,
     oauthClientSecret: process.env.OAUTH_CLIENT_SECRET,
     callbackURL: process.env.CALLBACK_URL,

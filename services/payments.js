@@ -4,6 +4,8 @@ const CartModel = require("../models/cart");
 const paypal = require("@paypal/checkout-server-sdk"); // se utiliza para generar las ordenes
 const UserModel = require("../models/user");
 
+const mercadoPago = require('mercadopago');
+
 class Payments {
     async createPayPalOrder(idUser){
         const result = CartModel.findById(idUser);
@@ -49,6 +51,11 @@ class Payments {
                 },{new:true})
                 break;
         }
+    }
+
+    async createMPagoPayment(){
+
+        
     }
 }
 

@@ -12,17 +12,21 @@ function users(app){
         const users = await userServ.getAll() // Array de usuarios
         return res.json(users)
     })
-    router.post('/', async (req, res) => {
+    router.post('/', authValidation(2), async (req, res) => {
         const response = await userServ.create(req.body);
         return res.json(response)
     })
-    router.get("/:id",async (req,res)=>{
+    router.get("/:id", authValidation(2), async (req,res)=>{
         const user = await userServ.getById(req.params.id,req.body)
         return res.json(user)
     })
-    router.delete('/:id', async (req, res) => {
+    router.delete('/:id', authValidation(2), async (req, res) => {
         const response = await userServ.delete(req.params.id)
         return res.json(response)
+    })
+    router.put('/:id',authValidation(2), async ( req, res)=> {
+        const user = await userServ.update(req.params.id, req.body)
+        return res.json(user)
     })
 }
 

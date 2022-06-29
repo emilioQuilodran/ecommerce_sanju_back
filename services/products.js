@@ -23,7 +23,7 @@ class Products {
         return {
             sucess: true,
             data: products,
-            total: count,
+            total, //count
             page,
             prevPage,
             nextPage,

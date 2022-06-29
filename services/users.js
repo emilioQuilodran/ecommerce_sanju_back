@@ -64,6 +64,14 @@ class User{
             console.log(error);
         }
     }
+    async update(id,data){
+        try{
+            const user = await UserModel.findByIdAndUpdate(id,data,{new:true})
+            return user 
+        }catch(error){
+            console.log(error)
+        }
+    }
     async #encrypt(string){
         try{
             const salt = await bcrypt.genSalt()
