@@ -9,11 +9,6 @@ class Auth{
 
         const userServ = new User()
         const user = await userServ.getByEmail(email)
-        console.log(await this.#compare(password,user.password));
-
-
-        console.log(user);
-        console.log(password);
 
         if(user && await this.#compare(password,user.password)){
             return this.#getUserData(user)

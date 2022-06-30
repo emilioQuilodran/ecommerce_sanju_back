@@ -2,6 +2,7 @@ const dbError = require("../helpers/dbError")
 const UserModel = require("../models/user")
 const uuid = require("uuid")
 const bcrypt = require("bcrypt")
+const CartService = require("../services/cart")
 
 class User{
     async getAll(){
@@ -35,11 +36,17 @@ class User{
     }
 
     async create(data){
-        if(data && data.password){
-            data.password = await this.#encrypt(data.password)
-        }
+        let paypalCustomerID
         try{
-            const user = await UserModel.create(data)
+            if(data && data.password){
+                data.password = await this.#encrypt(data.password)
+            }
+        
+            const user = await UserModel.create({
+                ...data
+            })
+            const cartServ = new CartService()
+            const cart = await cartServ.create(user.id)
             return {
                 created:true,
                 user
