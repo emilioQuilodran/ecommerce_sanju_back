@@ -1,5 +1,5 @@
 const express = require('express');
-const authValidation = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth');
 const ProductsService = require("../services/products")
 
 function products(app){
@@ -16,12 +16,25 @@ function products(app){
         return res.json(result)
     });
 
-    router.get("/:id", authValidation(2), async (req,res)=>{
-        const product = await productsServ.getById(req.params.id,req.body)
-        return res.json(product)
+    router.get("/:id",async (req,res)=>{
+        const id = req.params.id
+        const limit = isNaN(parseInt(req.query.limit)) ? undefined: parseInt(req.query.limit)
+        const page = isNaN(parseInt(req.query.page)) ? undefined: parseInt(req.query.page)
+
+        const result = await productsServ.getAllByUser(limit,page,id)
+
+        return res.json(result)
     })
 
-    router.post("/",authValidation(1),async (req,res)=>{
+    router.get("/one/:id",async (req,res)=>{
+        const id = req.params.id
+
+        const result = await productsServ.getOne(id)
+
+        return res.json(result)
+    })
+
+    router.post("/",authMiddleware(1),async (req,res)=>{
         const result = await productsServ.create({
             ...req.body,
             owner:req.user.id
@@ -29,14 +42,14 @@ function products(app){
 
         return res.json(result)
     })
-    router.put('/:id', authValidation(2), async (req, res) => {
+    router.put('/:id', authMiddleware(1), async (req, res) => {
         const product = await productsServ.update(req.params.id, req.body)
         return res.json(product)
     })
 
-    router.delete("/:id", authValidation(2),async (req,res)=>{
-        const product = await productsServ.delete(req.params.id)
-        return res.json({msg: "product eliminado"})
+    router.delete("/:id", authMiddleware(1),async (req,res)=>{
+        const result = await productsServ.delete(req.params.id,req.user.id)
+        return res.status(result.success?200:403).json(result)
     })
 }
 

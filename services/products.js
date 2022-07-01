@@ -1,39 +1,25 @@
+const { stripeSecretKey } = require("../config")
+const { paginate } = require("../libs/pagination")
 const ProductModel = require("../models/product")
+const CartModel = require("../models/cart")
 
 class Products {
-    async getAll(limit=20, page=1){
-        const total = await ProductModel.count(); // : number
-        const totalPages = Math.ceil(total / limit);
+    async getAll(limit=20,page=1){
+        const products = await paginate("/api/products",limit,page,ProductModel)
 
-        const skip = (page-1)*limit
-
-        if(totalPages < page || page > totalPages ){
-            return {
-                success: false,
-                message: "Page not found",
-            }
-        }
-
-
-
-        const products = await ProductModel.find().skip(skip).limit(limit); // : limit devuelve la cantidad de elementos a partir de los qq se retiran de skip?
-        const nextPage = page === totalPages ? null : "/api/products?page=" + ( page + 1 )
-        const prevPage = page === 1 ? null : limit == 20?`/api/products?page=${page}`: `/api/products?page=${page}?limit=${limit}`
-        //: validaciones
-        return {
-            sucess: true,
-            data: products,
-            total, //count
-            page,
-            prevPage,
-            nextPage,
-            totalPages
-        }
-
-        return products;
+        return products
     }
-    async getAllProductsByUser(){
-        
+    async getAllByUser(limit=20,page=1,ownerId){
+        console.log(ownerId)
+        const products = await paginate("/api/products",limit,page,ProductModel,{owner:ownerId})
+
+        return products
+    }
+
+    async getOne(idProduct){
+        const product = await ProductModel.findById(idProduct)
+
+        return product
     }
 
     async create(data){
@@ -51,22 +37,31 @@ class Products {
         }
     }
 
-    async delete(id){
-        try{
-            const product = await ProductModel.findByIdAndDelete(id)
+    async delete(id, idUser){
+        try {
+            const product = await ProductModel.findOneAndDelete({
+                _id:id,
+                owner:idUser
+            })
+            await CartModel.updateMany({
+                $pull:{
+                    items:{
+                        _id:product.id
+                    }
+                }
+            })
 
-            return product 
-        }catch(error){
+            return {
+                success:true,
+                product,
+                message:"Deleted succesfully"
+            }
+        } catch (error) {
             console.log(error)
-        }
-    }
-
-    async getById(id){
-        try{
-            const product = await ProductModel.findById(id)
-            return product
-        }catch(error){
-            console.log(error)
+            return {
+                success:false,
+                message:"An error ocurred. Maybe you are not the owner"
+            }
         }
     }
 }

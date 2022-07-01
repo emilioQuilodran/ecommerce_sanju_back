@@ -63,6 +63,7 @@ class Auth{
     }
 
     #getUserData(user){
+        //añadir el customer id de mercado pago
         const userData = {
             role:user.role,
             name:user.name,

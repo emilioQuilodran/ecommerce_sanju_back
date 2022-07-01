@@ -12,8 +12,8 @@ const auth = require("./routes/auth")
 const users = require("./routes/users")
 const products = require('./routes/products');
 const cart = require("./routes/cart")
-const { useGoogleStrategy } = require("./middleware/authProvider")
 const payments = require("./routes/payments")
+const { useGoogleStrategy } = require("./middleware/authProvider")
 
 const app = express()
 
@@ -22,6 +22,7 @@ connection()
 
 // Utilizando middleware
 app.use(morgan("dev"))
+app.use("/api/webhooks/stripe",express.raw({type: 'application/json'}))
 app.use(express.json())
 app.use(cookie())
 app.use(cors({
@@ -36,6 +37,12 @@ app.use(session({
 app.use(passport.initialize())
 // Usando strategias
 passport.use(useGoogleStrategy())
+passport.serializeUser((user,done)=>{
+    done(null,user)
+})
+passport.deserializeUser((user,done)=>{
+    done(null,user)
+})
 
 
 // Usando rutas:

@@ -1,17 +1,22 @@
 const express = require("express")
-const authValidation = require("../middleware/auth")
-const webhooksService = require("../services/webhooks")
+const PaymentService = require('../services/payments')
 
 function webhooks(app){
     const router = express.Router()
-    const webhooksService = new WebhooksService();
+    const paymentServ = new PaymentService()
+
     app.use("/api/webhooks",router)
+
+    router.post("/stripe",async (req,res)=>{
+        const sig = req.headers['stripe-signature'];
+        const result = await paymentServ.confirm(req.body,sig)
+        return res.status(result.success?200:400).json(result)
+    })
    
-    router.post('/paypal', async (req, res) => {
+    router.post("/paypal",async (req,res)=>{
         console.log(req.body)
-        return res.status(200).json({
-            msg: "response"
-        });
+        await paymentServ.confirmPayPal(req.body)
+        return res.status(200).send("OK")
     })
 }
 
