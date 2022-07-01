@@ -13,6 +13,16 @@ function payments(app){
         return res.json(result)
     })
 
+    router.post('/createPaymentMP', authValidation(1), async (req, res)=>{
+        const result = await paymentsService.createMPagoPayment(req.user.id, req.body.email, req.body.payment_type_id)
+        return res.json(result)
+    })
+
+    router.get('/availablePaymentMethods', authValidation(1), async (req, res) => {
+        const result = await paymentsService.listPaymentMethodsMP()
+        return res.json(result)
+    })
+
 }
 
 module.exports = payments

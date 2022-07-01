@@ -12,7 +12,6 @@ function auth(app){
 
     router.post("/login",async (req,res)=>{
         const result = await authServ.login(req.body)
-
         return authResponse(res,result,401)
     })
     router.post("/signup",async (req,res)=>{

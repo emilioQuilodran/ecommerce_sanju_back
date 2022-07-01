@@ -18,7 +18,7 @@ class User{
     async getByEmail(email){
         try {
             const user = await UserModel.findOne({email})
-            console.log();
+
             return user
         } catch (error) {
             console.log(error)
@@ -26,22 +26,72 @@ class User{
         }
     }
 
-    async getOrCreate(data){
-        const user = await UserModel.findOne({provider:data.provider,idProvider:data.idProvider})
-        if(user){
-            return user
+    async getOrCreateByProvider(data){
+        const userData = {
+            provider:{
+                [data.provider]:true
+            },
+            idProvider:{
+                [data.provider]:data.idProvider
+            }
         }
-        data.password = uuid.v4()
-        return await UserModel.create(data)
+        let user = await UserModel.findOne(userData)
+        if(!user){
+            data.password = uuid.v4()
+            const newData ={
+                ...data,
+                ...userData
+            }
+            let stripeCustomerID
+            try {
+                /*const customer = await stripe.customers.create({
+                    name:data.name,
+                    email:data.email
+                })*/
+                //stripeCustomerID = customer.id
+                user = await UserModel.create({
+                    ...newData,
+                    //stripeCustomerID
+                })
+            } catch (error) {
+                //const customer = await stripe.customers.del(stripeCustomerID)
+                if(error.code===11000 && error.keyValue.email){ // Duplicated entry
+                    const email = error.keyValue.email
+                    const provider = "provider."+data.provider
+                    const idProvider = "idProvider."+data.provider
+                    user = await UserModel.findOneAndUpdate({
+                        email
+                    },{
+                        [provider]:true,
+                        [idProvider]:data.idProvider
+                    },{new:true})
+
+                    // {"$set":{
+                    // "userObjects":{
+                    //     "$mergeObjects":[
+                    //     "$userObjects",
+                    //     {"newerItem":"newervalue","newestItem":"newestvalue"}
+                    //     ]
+                    // }
+                    // }}
+                    return {
+                        created:true,
+                        user
+                    }
+                }
+                return dbError(error)
+            }
+        }
+        return {
+            created:true,
+            user
+        }
+        
     }
 
     async create(data){
         let paypalCustomerID
         try{
-            if(data && data.password){
-                data.password = await this.#encrypt(data.password)
-            }
-        
             const user = await UserModel.create({
                 ...data
             })
@@ -75,16 +125,6 @@ class User{
         try{
             const user = await UserModel.findByIdAndUpdate(id,data,{new:true})
             return user 
-        }catch(error){
-            console.log(error)
-        }
-    }
-    async #encrypt(string){
-        try{
-            const salt = await bcrypt.genSalt()
-            const hash = await bcrypt.hash(string,salt)
-
-            return hash
         }catch(error){
             console.log(error)
         }

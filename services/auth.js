@@ -9,11 +9,9 @@ class Auth{
 
         const userServ = new User()
         const user = await userServ.getByEmail(email)
-
         if(user && await this.#compare(password,user.password)){
             return this.#getUserData(user)
         }
-
         return {
             success:false,
             errors:["Las credenciales son incorrectas"]
@@ -50,7 +48,7 @@ class Auth{
             profilePic: data.photos[0].value,
             provider: data.provider
         }
-        const result = await userServ.getOrCreate(user)
+        const result = await userServ.getOrCreateByProvider(user)
 
         if(!result.created){
             // Verificar si el correo está en uso
@@ -71,7 +69,6 @@ class Auth{
             email:user.email,
             provider:user.provider,
             idProvider:user.idProvider,
-            stripeCustomerID:user.stripeCustomerID,
             id:user.id
         }
 

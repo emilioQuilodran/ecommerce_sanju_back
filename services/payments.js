@@ -1,11 +1,12 @@
-
+const { mercadoPagoSecretKey } = require("../config")
 const paypalClient = require("../libs/paypalClient");
 const CartModel = require("../models/cart");
 const paypal = require("@paypal/checkout-server-sdk"); // se utiliza para generar las ordenes
 const UserModel = require("../models/user");
 
-const mercadoPago = require('mercadopago');
-
+const mercadopago = require('mercadopago');
+mercadopago.configurations.setAccessToken(mercadoPagoSecretKey);
+const endpointSecret = "whsec_2d849de04e6aa72abd49bf02b669777334504a448b75a97e166203f8fb714ffe";
 class Payments {
     async createPayPalOrder(idUser){
         const result = CartModel.findById(idUser);
@@ -53,9 +54,32 @@ class Payments {
         }
     }
 
-    async createMPagoPayment(){
+    async listPaymentMethodsMP(){
+        try{
+            var response = await mercadopago.payment_methods.listAll();
+            return response;
+        }catch(err){
+            console.log(err);
+        }
+    }
 
-        
+    async createMPagoPayment(idUser, email, type){
+        const result = await CartModel.findById(idUser).populate("items._id", "name price")
+        const total = result.items.reduce((result,item)=>{
+            return result+(item._id.price*item.amount)
+        },0)
+
+        const data = await mercadopago.payment.create({
+            transaction_amount: total,
+            description: 'Pago de productos',
+            payment_method_id: type,
+            payer: {
+              email: email
+            }
+        })
+
+        console.log(data)
+        return data.body;
     }
 }
 
