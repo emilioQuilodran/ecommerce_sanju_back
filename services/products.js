@@ -17,6 +17,7 @@ class Products {
     }
 
     async getOne(idProduct){
+        console.log("id:" , idProduct);
         const product = await ProductModel.findById(idProduct)
 
         return product

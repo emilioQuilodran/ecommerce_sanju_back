@@ -7,7 +7,7 @@ class Cart{
     async getItems(idUser){
         const result = await CartModel.findById(idUser).populate("items._id","name price images")
         console.log(result)
-        const products = result.items.map(product=>{
+        const products = result?.items.map(product=>{
             return {
                 ...product._id?._doc,
                 amount:product.amount

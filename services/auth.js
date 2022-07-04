@@ -48,13 +48,13 @@ class Auth{
             profilePic: data.photos[0].value,
             provider: data.provider
         }
+
         const result = await userServ.getOrCreateByProvider(user)
 
         if(!result.created){
             // Verificar si el correo está en uso
             return {
                 success:false,
-
                 errors:result.errors
             }
         }
@@ -62,7 +62,9 @@ class Auth{
         return this.#getUserData(result)
     }
 
-    #getUserData(user){
+    #getUserData({user}){
+        console.log("user", user);
+
         //añadir el customer id de mercado pago
         const userData = {
             role:user.role,
@@ -74,6 +76,7 @@ class Auth{
         }
 
         const token = this.#createToken(userData)
+
         return {
             success:true,
             user:userData,

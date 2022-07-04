@@ -38,7 +38,6 @@ function auth(app){
         const user = req.user.profile
         const result = await authServ.socialLogin(user)
 
-        console.log(user)
         return providerResponse(res,result,401)
     })
 }
