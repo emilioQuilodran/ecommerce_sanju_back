@@ -26,7 +26,6 @@ class Auth{
         data.provider = {
             local:true
         }
-        console.log("data: ", data);
         const userServ = new User()
         const result = await userServ.create(data)
         if(!result.created){
@@ -59,12 +58,10 @@ class Auth{
             }
         }
 
-        return this.#getUserData(result)
+        return this.#getUserData(result.user)
     }
 
-    #getUserData({user}){
-        console.log("user", user);
-
+    #getUserData(user){
         //añadir el customer id de mercado pago
         const userData = {
             role:user.role,

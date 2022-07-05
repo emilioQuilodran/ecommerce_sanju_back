@@ -21,6 +21,7 @@ function auth(app){
     })
 
     router.get("/logout",(req,res)=>{
+        req.user = "";
         return deleteCookie(res)
     })
 
@@ -37,7 +38,7 @@ function auth(app){
     router.get("/google/callback",passport.authenticate("google",{session:false}), async (req,res)=>{
         const user = req.user.profile
         const result = await authServ.socialLogin(user)
-
+        console.log("result: ",result)
         return providerResponse(res,result,401)
     })
 }
